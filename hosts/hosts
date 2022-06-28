@@ -1,0 +1,6 @@
+[DEBIAN:children]
+DOCKER
+
+[DOCKER]
+docker.blu.local
+
