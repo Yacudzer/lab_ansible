@@ -1,0 +1,8 @@
+---
+- name: playbook for initialization fresh os
+  hosts: all
+  become: yes
+
+  roles:
+  - add_ansible_user
+
