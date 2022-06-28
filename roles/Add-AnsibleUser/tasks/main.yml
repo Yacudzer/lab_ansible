@@ -1,0 +1,11 @@
+---
+# tasks file for add_ansible_user
+- name: Ping
+  ping:
+
+- name: install sudo
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+
+
