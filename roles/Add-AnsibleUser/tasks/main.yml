@@ -1,11 +1,49 @@
 ---
 # tasks file for add_ansible_user
-- name: Ping
-  ping:
 
 - name: install sudo
   ansible.builtin.apt:
     name: sudo
     state: present
 
+- name: add user
+  ansible.builtin.user:
+    name: "{{ ansible_new_user }}"
+    groups: sudo
+    system: yes
+    append: yes
+    shell: /bin/bash
+    password: '!'
 
+- name: upload ssh key
+  authorized_key:
+    user: "{{ ansible_new_user }}"
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', '/var/local/ansible/.ssh/id_rsa.pub') }}"
+
+- name: allow sudoers for full access
+  community.general.sudoers:
+    name: "{{ ansible_new_user }}_user"
+    user: "{{ ansible_new_user }}"
+    commands: ALL
+    state: present
+    nopassword: yes
+
+- name: change root password
+  ansible.builtin.user:
+    name: root
+    state: present
+    password: "{{ new_root_password | string | password_hash('sha512') }}"
+
+- name: disable root login from ssh
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: '^\s*PermitRootLogin\s*yes'
+    line: PermitRootLogin no
+
+- name: restart sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
