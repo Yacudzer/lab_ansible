@@ -1,0 +1,8 @@
+---
+- name: adding yac-user
+  hosts: all
+  become: yes
+
+  roles:
+  - Add-Yacudzer
+

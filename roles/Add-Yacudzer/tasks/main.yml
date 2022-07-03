@@ -1,0 +1,19 @@
+---
+# tasks file for Add-Yacudzer
+
+- name: add user
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: sudo
+    system: no
+    append: yes
+    shell: /bin/bash
+    password: "{{ user_password | string | password_hash('sha512') }}"
+
+- name: add key
+  authorized_key:
+    user: "{{ user_name }}"
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', 'id_rsa.pub') }}"
+
