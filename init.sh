@@ -1,9 +1,10 @@
 #!/bin/bash
-#!/bin/bash
-if [ $# == 0 ]; then
-        echo "No params. Please type hostname or IP address of your machine"
+templatehostname="debiantemplate"
+
+if [[ $# == 0 ]]; then
+        echo "No params. Please type NEW hostname for $templatehostname"
         exit 1
 fi
 
-ansible-playbook --vault-password-file ./.secrets/vault-password init.yaml
+ansible-playbook --vault-password-file ./.secrets/vault-password init.yaml --extra-vars "new_hostname=$1"
 

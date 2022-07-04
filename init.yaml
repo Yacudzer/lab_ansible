@@ -1,9 +1,10 @@
 ---
 - name: playbook for initialization fresh os
-  hosts: all
+  hosts: DEBIAN_TEMPLATE
   become: yes
 
   roles:
   - Add-AnsibleUser
   - Add-Yacudzer
+  - Change-HostName
 

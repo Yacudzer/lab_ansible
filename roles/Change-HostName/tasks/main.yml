@@ -1,0 +1,16 @@
+---
+# tasks file for Change-HostName
+- name: changing hostname block
+  block:
+  - name: changing hostname
+    ansible.builtin.hostname:
+      name: "{{ new_hostname }}"
+
+  - name: reboot server
+    command: "shutdown -r now"
+    async: 1
+    poll: 0
+
+  when: new_hostname is defined
+
+
