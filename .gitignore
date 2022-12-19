@@ -4,3 +4,6 @@
 # .gitignore add always!
 !.gitignore
 
+# vim temporary files
+.*.swp
+

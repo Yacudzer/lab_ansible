@@ -1,0 +1,8 @@
+---
+- name: adding yac-user
+  hosts: DOCKER 
+  become: yes
+
+  roles:
+  - Install-Docker
+

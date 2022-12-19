@@ -1,0 +1,7 @@
+---
+# tasks file for roles/Install-Docker
+- name: install docker
+  ansible.builtin.apt:
+    name: docker
+    state: present
+
