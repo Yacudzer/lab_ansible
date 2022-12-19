@@ -1,2 +1,5 @@
 ---
 # vars file for roles/Install-Docker
+temp_script_name: /tmp/docker_installer.sh
+docker_install_url: https://get.docker.com
+

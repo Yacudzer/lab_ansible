@@ -1,7 +1,37 @@
 ---
 # tasks file for roles/Install-Docker
-- name: install docker
-  ansible.builtin.apt:
+#- name: install curl
+#  ansible.builtin.apt:
+#    name: curl
+#    state: present
+
+- name: Check if docker installed
+  command: dpkg-query -l docker
+  ignore_errors: True
+  register: package_check
+
+- name: Install ansible with script
+  block:
+  - name: save sh script
+    get_url:
+      url: "{{ docker_install_url }}"
+      dest: "{{ temp_script_name }}"
+  
+  - name: install docker
+    shell: "sh {{ temp_script_name }}"
+    args:
+      executable: "/bin/sh"
+  
+  - name: delete sh script
+    file:
+      path: "{{ temp_script_name }}"
+      state: absent
+  when: package_check is not succeeded
+
+- name: Upgrade ansible
+  apt:
     name: docker
-    state: present
+    state: latest
+    update-cache: yes
+  when: package_check is succeeded
 
