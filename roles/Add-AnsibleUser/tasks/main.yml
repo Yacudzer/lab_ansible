@@ -1,6 +1,15 @@
 ---
 # tasks file for add_ansible_user
 
+- name: full upgrade
+  ansible.builtin.apt:
+    upgrade: full
+    update_cache: yes
+
+- name: remove old packages
+  ansible.builtin.apt:
+    autoremove: yes
+
 - name: install sudo
   ansible.builtin.apt:
     name: sudo
