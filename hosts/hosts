@@ -3,6 +3,7 @@ DOCKER
 
 [DOCKER]
 docker.blu.local
+test01.blu.local
 
 [DEBIAN_TEMPLATE]
 debiantemplate.blu.local
