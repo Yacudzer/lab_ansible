@@ -1,5 +1,5 @@
 ---
-- name: adding yac-user
+- name: docker installation
   hosts: DOCKER 
   become: yes
 
