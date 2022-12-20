@@ -1,0 +1,8 @@
+---
+- name: kubectl installation
+  hosts: DOCKER 
+  become: yes
+
+  roles:
+  - Install-Kubectl
+
