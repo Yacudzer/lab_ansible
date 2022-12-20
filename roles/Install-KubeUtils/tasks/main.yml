@@ -1,5 +1,5 @@
 ---
-# tasks file for roles/Install-Kubectl
+# tasks file for roles/Install-KubeUtils
 - name: Install pre-requirements
   ansible.builtin.apt:
     update-cache: yes
@@ -8,21 +8,45 @@
     - ca-certificates 
     - apt-transport-https
     state: latest
+  tags:
+  - always
 
 - name: Make /etc/apt/keyrings directory if needed
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
+  tags:
+  - always
 
 - name: Download the Google Cloud public signing key
   shell: 'curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg'
+  tags:
+  - always
 
 - name: Add the Kubernetes apt repository
   shell: 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
+  tags:
+  - always
 
-- name: Update apt package index with the new repository and install kubectl
+- name: Update apt and install kubectl
   ansible.builtin.apt:
     update-cache: yes
     name: kubectl
+  tags:
+  - kubectl
+
+- name: Update apt and install kubelet
+  ansible.builtin.apt:
+    update-cache: yes
+    name: kubelet
+  tags:
+  - kubelet
+
+- name: Update apt and install kubeadm
+  ansible.builtin.apt:
+    update-cache: yes
+    name: kubeadm
+  tags:
+  - kubeadm
 

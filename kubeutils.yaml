@@ -1,0 +1,8 @@
+---
+- name: kubeutils installation
+  hosts: K8S01 
+  become: yes
+
+  roles:
+  - Install-KubeUtils
+

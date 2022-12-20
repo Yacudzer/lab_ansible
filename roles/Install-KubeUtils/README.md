@@ -1,7 +1,10 @@
 Role Name
 =========
 
-Роль для установки свежей версии cubectl
+Роль для установки свежей версии утилит k8s:
+kubelet
+kubeadm
+kubectl
 
 Requirements
 ------------
