@@ -9,14 +9,14 @@ debiantemplate.blu.local
 
 
 # k8s cluster start from here
-[K8S_TEST01:children]
-K8S_TEST01_MASTER
-K8S_TEST01_WORKER
+[K8S01:children]
+K8S01_MASTER
+K8S01_WORKER
 
-[K8S_TEST01_MASTER]
+[K8S01_MASTER]
 k8s01mst01.blu.local
 
-[K8S_TEST01_WORKER]
+[K8S01_WORKER]
 k8s01wrk01.blu.local
 k8s01wrk02.blu.local
 k8s01wrk03.blu.local
