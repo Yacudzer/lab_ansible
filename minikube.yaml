@@ -1,0 +1,8 @@
+---
+- name: minikube installation
+  hosts: DOCKER
+  become: yes
+
+  roles:
+  - Install-Minikube
+
