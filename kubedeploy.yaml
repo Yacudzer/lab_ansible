@@ -1,0 +1,11 @@
+---
+- name: deploy pure cube cluster
+  hosts: K8S01 
+  become: yes
+
+  roles:
+  - role: Install-Docker
+    tags: [always]
+
+  - role: Install-KubeUtils
+
