@@ -5,6 +5,7 @@
 
   roles:
   - Add-AnsibleUser
+  - Change-MachineId
   - Add-Yacudzer
   - Change-HostName
 
