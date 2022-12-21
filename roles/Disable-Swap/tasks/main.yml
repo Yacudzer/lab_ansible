@@ -1,0 +1,17 @@
+---
+# tasks file for roles/Disable-Swap
+- name: disable swap in fstab for next reboot
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^(\s*[^#\n]+\s+\w+\s+swap\s+\w+)(\s+.*)$'
+    replace: '\1,noauto\2'
+    backup: yes
+
+- name: disable swap in current session
+  ansible.builtin.shell: "swapoff -a"
+
+- name: delete /swap.img
+  ansible.builtin.file:
+    path: /swap.img
+    state: absent
+
