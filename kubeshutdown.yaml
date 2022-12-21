@@ -1,0 +1,11 @@
+---
+- name: shutdown k8s01 cluster
+  hosts: K8S01 
+  become: yes
+
+  tasks:
+  - name: reboot server
+    command: "shutdown now"
+    async: 1
+    poll: 0
+
