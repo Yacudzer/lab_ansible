@@ -29,6 +29,13 @@
   tags:
   - always
 
+- name: Update apt and install kubeadm
+  ansible.builtin.apt:
+    update-cache: yes
+    name: kubeadm
+  tags:
+  - kubeadm
+
 - name: Update apt and install kubectl
   ansible.builtin.apt:
     update-cache: yes
@@ -42,11 +49,4 @@
     name: kubelet
   tags:
   - kubelet
-
-- name: Update apt and install kubeadm
-  ansible.builtin.apt:
-    update-cache: yes
-    name: kubeadm
-  tags:
-  - kubeadm
 
