@@ -7,3 +7,6 @@
 # vim temporary files
 .*.swp
 
+# disable test yaml files
+_*.yaml
+
