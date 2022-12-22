@@ -5,33 +5,18 @@
 #    name: curl
 #    state: present
 
-- name: Check if docker installed
-  command: dpkg-query -l docker
-  ignore_errors: True
-  register: package_check
+- name: save sh script
+  get_url:
+    url: "{{ docker_install_url }}"
+    dest: "{{ temp_script_name }}"
 
-- name: Install ansible with script
-  block:
-  - name: save sh script
-    get_url:
-      url: "{{ docker_install_url }}"
-      dest: "{{ temp_script_name }}"
-  
-  - name: install docker
-    shell: "sh {{ temp_script_name }}"
-    args:
-      executable: "/bin/sh"
-  
-  - name: delete sh script
-    file:
-      path: "{{ temp_script_name }}"
-      state: absent
-  when: package_check is not succeeded
+- name: install docker
+  shell: "sh {{ temp_script_name }}"
+  args:
+    executable: "/bin/sh"
 
-- name: Upgrade ansible
-  apt:
-    name: docker
-    state: latest
-    update-cache: yes
-  when: package_check is succeeded
+- name: delete sh script
+  file:
+    path: "{{ temp_script_name }}"
+    state: absent
 
