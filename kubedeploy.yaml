@@ -8,4 +8,5 @@
 
   - role: Install-KubeUtils
   - role: Disable-Swap
+  - role: Init-K8s
 

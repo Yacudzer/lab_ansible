@@ -1,0 +1,7 @@
+---
+# vars file for roles/Init-K8s
+sysctl_need_result:
+  - "(^|\\n)\\s*net.bridge.bridge-nf-call-iptables\\s*=\\s*1\\s*(\\n|$)"
+  - "(^|\\n)\\s*net.bridge.bridge-nf-call-ip6tables\\s*=\\s*1\\s*(\\n|$)"
+  - "(^|\\n)\\s*net.ipv4.ip_forward\\s*=\\s*1\\s*(\\n|$)"
+

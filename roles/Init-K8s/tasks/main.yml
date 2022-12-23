@@ -1,0 +1,62 @@
+---
+# tasks file for roles/Init-K8s
+### check and init br_netfilter if needed
+- name: checking br_netfilter
+  ansible.builtin.shell: "lsmod | grep br_netfilter"
+  register: lsmod_result
+  failed_when: lsmod_result.rc not in [0,1]
+
+- name: block for setup br_netfilter
+  block:
+
+  - name: modprobe br_netfilter
+    ansible.builtin.shell: "modprobe br_netfilter"
+
+  - name: checking for br_netfilter setup result
+    ansible.builtin.shell: "lsmod | grep br_netfilter"
+    register: lsmod_result
+    failed_when: lsmod_result.stdout_lines | length == 0 or lsmod_result.rc != 0
+
+  when: lsmod_result.stdout_lines | length == 0
+
+- name: checking for overlay
+  ansible.builtin.shell: "lsmod | grep overlay"
+  register: overlay_result
+  failed_when: overlay_result.stdout_lines | length == 0 or overlay_result.rc != 0
+
+### /etc/sysctl.d/k8s.conf init
+- name: /etc/sysctl.d/k8s.conf install
+  ansible.builtin.copy:
+    src: k8s.conf
+    dest: /etc/sysctl.d/k8s.conf
+    owner: root
+    group: root
+    mode: 0644
+  register: result
+
+- name: sysctl config apply
+  shell: sysctl --system
+  when: result.changed
+
+
+### checking for system variables
+- name: getting variables
+  shell: sysctl net.bridge.bridge-nf-call-iptables net.bridge.bridge-nf-call-ip6tables net.ipv4.ip_forward
+  register: sysctl_result
+
+- name: debug sysctl_result
+  debug:
+    var: sysctl_result
+  tags: [never,debug]
+
+- name: debug sysctl_need_result
+  debug:
+    var: sysctl_need_result
+  tags: [never, debug]
+
+- name: checking for results
+  debug:
+    msg: "{{ item }} checked successfull"
+  failed_when: sysctl_result.stdout is not regex(item)
+  with_items: "{{ sysctl_need_result }}"
+
