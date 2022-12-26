@@ -1,0 +1,7 @@
+- name: deploy k8s master
+  hosts: K8S01_MASTER
+  become: yes
+
+  roles:
+  - Init-K8sMaster
+

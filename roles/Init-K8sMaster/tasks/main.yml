@@ -1,0 +1,35 @@
+---
+# tasks file for roles/Init-K8sMaster
+- name: if var 'ip' is not setting
+  block:
+    
+  - name: getting default ip-mask
+    set_fact:
+      k8s_master_ip_mask: "{{ ansible_default_ipv4.address }}/{{ ansible_default_ipv4.netmask }}"
+  
+  - name: making ip address with prefix
+    set_fact:
+      k8s_master_ip_prefix: "{{ k8s_master_ip_mask | ansible.utils.ipaddr('address/prefix') }}"
+  when: ip is undefined
+
+- name: checking that ip/mask is correct
+  set_fact:
+    k8s_master_ip_prefix: "{{ ip | ansible.utils.ipaddr('address/prefix') }}"
+  failed_when: k8s_master_ip_prefix is false
+  when: ip is defined
+
+- name: fail if var 'pod_network' not defined
+  fail:
+    msg: "The variable 'pod_network' not defined"
+  when: pod_network is undefined
+
+- name: checking that cidr of pod network is correct
+  set_fact:
+    k8s_pod_network: "{{ pod_network | ansible.utils.ipaddr('net') }}"
+  failed_when: k8s_pod_network|length==0
+
+- name: debugging k8s_master_ip_prefix
+  debug:
+    msg: "shared ip: {{ k8s_master_ip_prefix }}, pod network: {{ k8s_pod_network }}"
+  tags: [debug,never]
+
