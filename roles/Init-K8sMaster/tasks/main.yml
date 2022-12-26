@@ -31,5 +31,5 @@
 - name: debugging k8s_master_ip_prefix
   debug:
     msg: "shared ip: {{ k8s_master_ip_prefix }}, pod network: {{ k8s_pod_network }}"
-  tags: [debug,never]
+  tags: [never, debug]
 
