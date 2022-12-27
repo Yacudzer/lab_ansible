@@ -49,7 +49,7 @@
       name: git
       state: latest
 
-  - name: remove old cri-dockerd installation
+  - name: remove old FAILED cri-dockerd installation
     ansible.builtin.file:
       path: "{{ installer_path }}/{{ cridockerd_subdir }}"
       state: absent
@@ -105,4 +105,8 @@
       state: started
       enabled: yes
 
+  - name: remove old CURRENT cri-dockerd installation
+    ansible.builtin.file:
+      path: "{{ installer_path }}/{{ cridockerd_subdir }}"
+      state: absent
 
