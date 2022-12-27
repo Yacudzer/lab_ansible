@@ -2,5 +2,8 @@
 # vars file for roles/Install-Cri-dockerd
 installer_file_name: "installer_linux"
 go_installer_url: "https://storage.googleapis.com/golang/getgo/{{ installer_file_name }}"
-installer_path: ~
 
+# installet path MUST be absolutly!
+installer_path: "/root"
+
+cridockerd_subdir: "cri-dockerd"

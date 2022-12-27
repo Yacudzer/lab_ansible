@@ -34,6 +34,11 @@
       var: go_version.stdout
     tags: [never, debug]
 
+  - name: remove installer
+    ansible.builtin.file:
+      path: "{{ installer_path }}/{{ installer_file_name }}"
+      state: absent
+
 - name: Install cri-dockerd
   tags: [cri-dockerd_install]
   block:
@@ -46,23 +51,24 @@
 
   - name: remove old cri-dockerd installation
     ansible.builtin.file:
-      path: cri-dockerd
+      path: "{{ installer_path }}/{{ cridockerd_subdir }}"
       state: absent
 
   - name: downloading cri-dockerd
-    shell: "git clone https://github.com/Mirantis/cri-dockerd"
+    ansible.builtin.shell: "git clone https://github.com/Mirantis/cri-dockerd {{ installer_path }}/{{ cridockerd_subdir }}"
+
 
   - name: make dir bin
     ansible.builtin.file:
-      path: cri-dockerd/bin
+      path: "{{ installer_path }}/{{ cridockerd_subdir }}/bin"
       state: directory
       mode: "0755"
-    
 
   - name: compile cri-dockerd
-    shell: "sudo -i go build bin/cri-dockerd"
+    ansible.builtin.shell: "source $HOME/.bash_profile && go build -o bin/cri-dockerd"
     args:
-      chdir: cri-dockerd
+      chdir: "{{ installer_path }}/{{ cridockerd_subdir }}"
+      executable: /bin/bash
 
   - name: make big directory
     ansible.builtin.file:
@@ -73,17 +79,12 @@
   - name: install bin file
     shell: "install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd"
     args:
-      chdir: cri-dockerd
+      chdir: "{{ installer_path }}/{{ cridockerd_subdir }}"
 
   - name: copy systemd service file
     ansible.builtin.shell: "cp -a packaging/systemd/* /etc/systemd/system"
     args:
-      chdir: cri-dockerd
-
-  - name: Stop HERE
-    fail:
-      msg: STOP
-    tags: [never,debug]
+      chdir: "{{ installer_path }}/{{ cridockerd_subdir }}"
 
   - name: change path in service file
     ansible.builtin.replace:
