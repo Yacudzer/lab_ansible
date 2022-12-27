@@ -1,0 +1,107 @@
+---
+# tasks file for roles/Install-Cri-dockerd
+- name: Install GO
+  tags: [go_install]
+  block:
+
+  - name: download installer
+    ansible.builtin.get_url:
+      url: "{{ go_installer_url }}"
+      dest: "{{ installer_path }}/{{ installer_file_name }}"
+
+  - name: add executable flag
+    ansible.builtin.file:
+      dest: "{{ installer_path }}/{{ installer_file_name }}"
+      mode: a+x
+
+  - name: execute installer
+    ansible.builtin.shell: "{{ installer_path }}/{{installer_file_name }}"
+
+  - name: bash profile activate
+    ansible.builtin.shell: "source $HOME/.bash_profile"
+    args:
+      executable: /bin/bash
+
+  - name: getting go version 
+    ansible.builtin.shell: "sudo -i go version"
+    args:
+      executable: /bin/bash
+    register: go_version
+    tags: [never, debug]
+
+  - name: show go version
+    ansible.builtin.debug:
+      var: go_version.stdout
+    tags: [never, debug]
+
+- name: Install cri-dockerd
+  tags: [cri-dockerd_install]
+  block:
+
+  - name: install git
+    ansible.builtin.apt:
+      update-cache: yes
+      name: git
+      state: latest
+
+  - name: remove old cri-dockerd installation
+    ansible.builtin.file:
+      path: cri-dockerd
+      state: absent
+
+  - name: downloading cri-dockerd
+    shell: "git clone https://github.com/Mirantis/cri-dockerd"
+
+  - name: make dir bin
+    ansible.builtin.file:
+      path: cri-dockerd/bin
+      state: directory
+      mode: "0755"
+    
+
+  - name: compile cri-dockerd
+    shell: "sudo -i go build bin/cri-dockerd"
+    args:
+      chdir: cri-dockerd
+
+  - name: make big directory
+    ansible.builtin.file:
+      path: /usr/local/bin
+      state: directory
+      mode: "0755"
+
+  - name: install bin file
+    shell: "install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd"
+    args:
+      chdir: cri-dockerd
+
+  - name: copy systemd service file
+    ansible.builtin.shell: "cp -a packaging/systemd/* /etc/systemd/system"
+    args:
+      chdir: cri-dockerd
+
+  - name: Stop HERE
+    fail:
+      msg: STOP
+    tags: [never,debug]
+
+  - name: change path in service file
+    ansible.builtin.replace:
+      path: /etc/systemd/system/cri-docker.service
+      regexp: "/usr/bin/cri-dockerd"
+      replace: "/usr/local/bin/cri-dockerd"
+
+  - name: systemd daemon reload, cri-docker.service enable and start
+    ansible.builtin.systemd:
+      name: cri-docker.service
+      state: started
+      enabled: yes
+      daemon-reload: yes
+
+  - name: systemd cri-docker.socket enable and start
+    ansible.builtin.systemd:
+      name: cri-docker.socket
+      state: started
+      enabled: yes
+
+
