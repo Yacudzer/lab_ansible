@@ -1,0 +1,37 @@
+---
+# tasks file for roles/Install-DockerEngine
+- name: Install pre-requirement software
+  apt:
+    update-cache: yes
+    pkg:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+    state: latest
+
+- name: Make directory keyrings if needed
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: download keys
+  shell: "curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor > /etc/apt/keyrings/docker.gpg"
+
+- name: set up the repository
+  shell: >-
+    echo
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian
+    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+- name: Install Docker Engine
+  apt:
+    update-cache: yes
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+    state: latest
+
