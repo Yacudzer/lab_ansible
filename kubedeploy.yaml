@@ -1,12 +1,27 @@
 ---
-- name: deploy pure cube cluster
-  hosts: K8S01 
+- name: Initiate variables
+  hosts: K8S01
+  tasks:
+  - name: variable kubeadm_filename setup
+    set_fact:
+      kubeadm_filename: "_kubeadm_join_{{ ansible_date_time.epoch_int }}.tmp"
+      cri_socket: "cri-dockerd"
+    run_once: true
+
+#- name: deploy pure cube cluster
+#  hosts: K8S01 
+#  become: yes
+#
+#  roles:
+#  - role: Install-DockerEngine
+#  - role: Install-Cri-dockerd
+#  - role: Install-KubeUtils
+#  - role: Disable-Swap
+
+- name: control plane init
+  hosts: K8S01_MASTER
   become: yes
 
   roles:
-  - role: Install-Docker
-
-  - role: Install-KubeUtils
-  - role: Disable-Swap
-  - role: Init-K8s
+  - role: Init-K8sMaster
 

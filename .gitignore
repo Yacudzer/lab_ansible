@@ -10,3 +10,5 @@
 # disable test yaml files
 _*.yaml
 
+# temp files for joining to cluster
+_kubeadm_join*.tmp

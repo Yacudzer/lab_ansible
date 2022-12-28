@@ -1,22 +1,27 @@
 ---
 # tasks file for roles/Init-K8sMaster
-- name: if var 'ip' is not setting
-  block:
-    
-  - name: getting default ip-mask
-    set_fact:
-      k8s_master_ip_mask: "{{ ansible_default_ipv4.address }}/{{ ansible_default_ipv4.netmask }}"
-  
-  - name: making ip address with prefix
-    set_fact:
-      k8s_master_ip_prefix: "{{ k8s_master_ip_mask | ansible.utils.ipaddr('address/prefix') }}"
-  when: ip is undefined
 
-- name: checking that ip/mask is correct
-  set_fact:
-    k8s_master_ip_prefix: "{{ ip | ansible.utils.ipaddr('address/prefix') }}"
-  failed_when: k8s_master_ip_prefix is false
+- name: block for adding api address
+  block:
+  - name: checking that ip/mask is correct
+    set_fact:
+      api_addr: "{{ ip | ansible.utils.ipaddr('address') }}"
+
+  - name: stop if api_addr incorrect
+    fail:
+      msg: "The variable 'ip' for api address is incorrect"
+    when: api_addr is false or api_addr|length == 0
+
+  - name: define api addr additional param
+    set_fact:
+      add_api_addr: "--apiserver-advertise-address={{ api_addr }}"
+
   when: ip is defined
+
+- name: no api addr
+  set_fact:
+    add_api_addr: ""
+  when: ip is undefined
 
 - name: fail if var 'pod_network' not defined
   fail:
@@ -28,8 +33,49 @@
     k8s_pod_network: "{{ pod_network | ansible.utils.ipaddr('net') }}"
   failed_when: k8s_pod_network|length==0
 
-- name: debugging k8s_master_ip_prefix
+- name: add param text to k8s_pod_network
+  set_fact:
+    k8s_pod_network: "--pod-network-cidr {{ k8s_pod_network }}"
+
+########################## add custom socket here ###############################
+- name: define empty add_cri_socket
+  set_fact:
+    add_cri_socket: ""
+
+- name: add cri_socket param
+  block:
+
+  - name: if cri_socket is cri-dockerd
+    set_fact:
+      add_cri_socket: "--cri-socket unix:///var/run/cri-dockerd.sock"
+    when: cri_socket == "cri-dockerd"
+
+  when: cri_socket is defined
+#################################################################################
+
+- name: debugging command params
   debug:
-    msg: "shared ip: {{ k8s_master_ip_prefix }}, pod network: {{ k8s_pod_network }}"
+    msg: "shared ip param: {{ add_api_addr }}, pod network: {{ k8s_pod_network }}, cri-socket: {{ add_cri_socket }}"
   tags: [never, debug]
+
+- name: init cluster
+  shell:
+    cmd: "kubeadm init {{ add_api_addr }} {{ k8s_pod_network }} {{ add_cri_socket }}"
+  register: kubeadm_result
+
+- name: debug init result
+  debug:
+    var: kubeadm_result
+
+- name: save results to var
+  set_fact:
+    kubeadm_join_cmd: "{{ kubeadm_result.stdout }}"
+
+- name: save results to file
+  become: no
+  local_action:
+    module: copy
+    content: "{{ kubeadm_join_cmd }}"
+    dest: "{{ kubeadm_filename }}"
+
 
