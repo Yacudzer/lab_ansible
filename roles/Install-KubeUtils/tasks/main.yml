@@ -20,33 +20,26 @@
   - always
 
 - name: Download the Google Cloud public signing key
-  shell: 'curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg'
+  ansible.builtin.shell: 'curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg'
   tags:
   - always
 
 - name: Add the Kubernetes apt repository
-  shell: 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
+  ansible.builtin.shell: 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
   tags:
   - always
 
 - name: Update apt and install kubeadm
   ansible.builtin.apt:
     update-cache: yes
-    name: kubeadm
+    pkg:
+    - kubeadm
+    - kubelet
+    - kubectl
+    state: present
   tags:
   - kubeadm
 
-- name: Update apt and install kubectl
-  ansible.builtin.apt:
-    update-cache: yes
-    name: kubectl
-  tags:
-  - kubectl
-
-- name: Update apt and install kubelet
-  ansible.builtin.apt:
-    update-cache: yes
-    name: kubelet
-  tags:
-  - kubelet
+- name: hold version of kube utils
+  ansible.builtin.shell: "apt-mark hold kubeadm kubelet kubectl"
 
