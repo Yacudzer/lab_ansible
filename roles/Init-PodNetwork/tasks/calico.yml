@@ -1,0 +1,14 @@
+---
+- name: Download manifest
+  ansible.builtin.shell:
+    cmd: "curl -so calico.yaml https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/calico.yaml"
+
+- name: Apply manifest for calico
+  ansible.builtin.shell:
+    cmd: "kubectl apply -f calico.yaml --kubeconfig='{{ kube_config }}'"
+
+- name: Delete calico.yaml
+  ansible.builtin.file:
+    path: calico.yaml
+    state: absent
+

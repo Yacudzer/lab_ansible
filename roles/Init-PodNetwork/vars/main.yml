@@ -1,0 +1,4 @@
+---
+# vars file for role/Init-PodNetwork
+kube_config: "/etc/kubernetes/admin.conf"
+

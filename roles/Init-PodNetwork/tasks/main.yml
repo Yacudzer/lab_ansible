@@ -1,0 +1,18 @@
+---
+# tasks file for role/Init-PodNetwork
+- name: Raise fail if pod_network_name not defined
+  fail:
+    msg: "Variable pod_network_name MUST be defined"
+  when: pod_network_name is undefined
+
+- name: Include tasks for pod-network-module
+  include_tasks: "{{ pod_network_name }}.yml"
+
+- name: waiting for result
+  ansible.builtin.shell:
+    cmd: "kubectl get nodes --kubeconfig='{{ kube_config }}'"
+  register: getnodes_result
+  until: getnodes_result.stdout | regex_search(inventory_hostname_short+'\\s+Ready') != None
+  retries: 30
+  delay: 5
+

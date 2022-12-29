@@ -1,0 +1,9 @@
+- name: checking for result
+  ansible.builtin.shell:
+    cmd: "kubectl get nodes --kubeconfig='{{ kube_config }}'"
+  register: getnodes_result
+
+- name: node_ready define
+  set_fact:
+    node_ready: "{{ getnodes_result.stdout | regex_search(inventory_hostname_short+'\\s+Ready') }}"
+
