@@ -1,6 +1,7 @@
 ---
 - name: Initiate variables
   hosts: K8S01
+  become: no
   tasks:
   - name: variable kubeadm_filename setup
     set_fact:
@@ -8,20 +9,63 @@
       cri_socket: "cri-dockerd"
     run_once: true
 
-#- name: deploy pure cube cluster
-#  hosts: K8S01 
-#  become: yes
-#
-#  roles:
-#  - role: Install-DockerEngine
-#  - role: Install-Cri-dockerd
-#  - role: Install-KubeUtils
-#  - role: Disable-Swap
+########################## add custom cri-socket here ############################
+  - name: define empty add_cri_socket
+    set_fact:
+      add_cri_socket: ""
+    run_once: true
+
+  - name: add cri_socket param
+    block:
+  
+    - name: if cri_socket is cri-dockerd
+      set_fact:
+        add_cri_socket: "--cri-socket unix:///var/run/cri-dockerd.sock"
+      when: cri_socket == "cri-dockerd"
+  
+    when: cri_socket is defined
+    run_once: true
+#################################################################################
+
+
+- name: deploy pure cube cluster
+  hosts: K8S01 
+  become: yes
+
+  roles:
+  - role: Install-DockerEngine
+  - role: Install-Cri-dockerd
+  - role: Install-KubeUtils
+  - role: Disable-Swap
 
 - name: control plane init
   hosts: K8S01_MASTER
   become: yes
+  vars:
+    pod_network: "10.1.10.0/24"
+    pod_network_name: "calico"
+    kube_config: "/etc/kubernetes/admin.conf"
 
   roles:
   - role: Init-K8sMaster
+  - role: Init-PodNetwork
+
+- name: join worker nodes
+  hosts: K8S01_WORKER
+  become: yes
+
+  roles:
+  - role: Join-WorkerNodes
+
+- name: finalize
+  hosts: K8S01
+  become: no
+
+  tasks:
+  - name: remove old kubeadm_filename
+    local_action:
+      module: file
+      path: "{{ kubeadm_filename }}"
+      state: absent
+    run_once: true
 

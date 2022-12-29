@@ -1,0 +1,14 @@
+---
+# tasks file for roles/Join-WorkerNodes
+- name: Read command from file
+  set_fact:
+    join_command: "{{ lookup('ansible.builtin.file',kubeadm_filename) | regex_search('(kubeadm join.+)\\\\\n(.+)(\n|$)','\\1','\\2')|join('')|replace('\t','') }}"
+
+- name: debug 
+  debug:
+    msg: "{{ join_command }}"
+
+- name: join nodes to master
+  ansible.builtin.shell:
+    cmd: "{{ join_command }} {{ add_cri_socket }}"
+
