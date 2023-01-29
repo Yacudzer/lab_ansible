@@ -1,0 +1,11 @@
+---
+- name: shutdown all nodes
+  hosts: all:!DEBIANTEMPLATE
+  become: yes
+
+  tasks:
+  - name: shutdown server
+    command: "shutdown now"
+    async: 1
+    poll: 0
+

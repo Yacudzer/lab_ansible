@@ -31,5 +31,5 @@ k8s01wrk02.blu.local
 k8s01wrk03.blu.local
 
 [VYOS]
-ROUTER ansible_host=10.1.1.1
+vyos.blu.local ansible_host=10.1.1.1
 
