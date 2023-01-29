@@ -1,0 +1,8 @@
+---
+- name: docker installation
+  hosts: GITLAB
+  become: yes
+
+  roles:
+  - Install-Docker
+

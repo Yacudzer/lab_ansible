@@ -1,8 +1,17 @@
+[DEBIAN]
+# staging.blu.local
+
 [DEBIAN:children]
 DOCKER
+GITLAB
+K8S01
+
 
 [DOCKER]
 docker.blu.local
+
+[GITLAB]
+gitlab.blu.local
 
 [DEBIAN_TEMPLATE]
 debiantemplate.blu.local
@@ -19,5 +28,8 @@ k8s01mst01.blu.local
 [K8S01_WORKER]
 k8s01wrk01.blu.local
 k8s01wrk02.blu.local
-# k8s01wrk03.blu.local
+k8s01wrk03.blu.local
+
+[VYOS]
+ROUTER ansible_host=10.1.1.1
 

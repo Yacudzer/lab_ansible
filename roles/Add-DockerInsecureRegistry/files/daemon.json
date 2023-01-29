@@ -1,0 +1,4 @@
+{
+  "insecure-registries" : ["gitlab.blu.local:5050"]
+}
+

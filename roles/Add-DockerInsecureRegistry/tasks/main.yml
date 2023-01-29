@@ -1,0 +1,12 @@
+---
+# tasks file for roles/Add-DockerInsecureRegistry
+- name: copy files
+  ansible.builtin.copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: restart docker service
+  ansible.builtin.service:
+    name: docker.service
+    state: restarted
+
