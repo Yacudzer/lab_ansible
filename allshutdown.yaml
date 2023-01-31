@@ -1,10 +1,20 @@
 ---
 - name: shutdown all nodes
-  hosts: all:!DEBIANTEMPLATE
+  hosts: all:!DEBIAN_TEMPLATE:!VYOS
   become: yes
 
   tasks:
   - name: shutdown server
+    command: "shutdown now"
+    async: 1
+    poll: 0
+
+- name: shutdown all nodes
+  hosts: VYOS
+  become: yes
+
+  tasks:
+  - name: shutdown router
     command: "shutdown now"
     async: 1
     poll: 0
