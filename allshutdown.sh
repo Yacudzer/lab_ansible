@@ -4,6 +4,7 @@ if [[ "$USER" != "root" ]]; then
 	exit 1
 fi
 cd `dirname ${BASH_SOURCE}`
-ansible-playbook allshutdown.yaml
+pwd
+sudo -u ansible ansible-playbook allshutdown.yaml
 shutdown now
 
