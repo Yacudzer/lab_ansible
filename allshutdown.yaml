@@ -15,7 +15,7 @@
 
   tasks:
   - name: shutdown router
-    command: "shutdown 1"
+    command: "shutdown now"
     async: 1
     poll: 0
 
